@@ -22,10 +22,14 @@ class SearchContainer extends Component {
       let apiResponse = await axios.get(
         `https://api.github.com/search/repositories?q=${this.state.inputText}`
       );
-      this.setState({
-        repositories: apiResponse.data.items,
-        errorMessage: null
-      });
+      if (apiResponse.data.items.length > 0) {
+        this.setState({
+          repositories: apiResponse.data.items,
+          errorMessage: null
+        });
+      } else {
+        this.setState({ errorMessage: "No Repositories found." });
+      }
     } else {
       this.setState({ errorMessage: "Enter a search string." });
     }
@@ -38,28 +42,36 @@ class SearchContainer extends Component {
         let dynamicStyle = {};
         let id = `${entry.id}`;
         if (_.includes(this.props.allRepositories, id)) {
-          dynamicStyle.backgroundColor = "salmon";
+          dynamicStyle.backgroundColor = "#99ccff";
         }
         return (
           <View key={key} style={[styles.repoContainer, dynamicStyle]}>
-            <Text style={styles.repoElements}>{entry.name}</Text>
-            <Text style={styles.repoElements}>
-              Stars: {entry.stargazers_count}
-            </Text>
-            <Text style={styles.repoElements}>Forks: {entry.forks}</Text>
-            <Button
-              title="Import"
-              onPress={() => {
-                this.props.importRepo(id);
-              }}
-            />
+            <View style={{ flex: 3 }}>
+              <Text style={[styles.repoElements, { fontSize: 25 }]}>
+                {entry.name}
+              </Text>
+              <Text style={styles.repoElements}>
+                Stars: {entry.stargazers_count}
+              </Text>
+              <Text style={styles.repoElements}>Forks: {entry.forks}</Text>
+            </View>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <Button
+                title="Import"
+                onPress={() => {
+                  this.props.importRepo(id);
+                }}
+              />
+            </View>
           </View>
         );
       });
+    } else {
+      searchResult = <Text>{this.state.errorMessage}</Text>;
     }
     return (
       <View style={styles.searchContainer}>
-        <View>
+        <View style={{ marginBottom: 20 }}>
           <Text style={{ fontSize: 22 }}>Search</Text>
           <TextInput
             onChangeText={event => {
@@ -94,12 +106,13 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flex: 14,
-    padding: 12
+    padding: 2
   },
   repoContainer: {
+    flexDirection: "row",
     margin: 0,
-    padding: 5,
-    borderWidth: 0.5
+    borderBottomWidth: 0.8,
+    padding: 3
   },
   repoElements: {
     padding: 5

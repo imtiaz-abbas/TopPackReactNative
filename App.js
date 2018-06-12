@@ -7,7 +7,9 @@
 import React, { Component } from "react";
 import NavBar from "./containers/NavBar.js";
 import SearchContainer from "./containers/SearchContainer";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, ScrollView, Text, View } from "react-native";
+import _ from "lodash";
+import TopPackContainer from "./containers/TopPackContainer";
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -15,7 +17,11 @@ export default class App extends Component<Props> {
     allRepositories: []
   };
   importRepo = id => {
-    this.setState({ allRepositories: [...this.state.allRepositories, id] });
+    if (_.includes(this.state.allRepositories, id)) {
+      //TODO SHOW USER THAT THE REPOSITORY HAS ALREADY BEEN IMPORTED....
+    } else {
+      this.setState({ allRepositories: [...this.state.allRepositories, id] });
+    }
   };
   render() {
     return (
