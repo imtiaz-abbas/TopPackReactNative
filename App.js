@@ -11,10 +11,20 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 
 type Props = {};
 export default class App extends Component<Props> {
+  state = {
+    allRepositories: []
+  };
+  importRepo = id => {
+    this.setState({ allRepositories: [...this.state.allRepositories, id] });
+  };
   render() {
     return (
       <View style={styles.container}>
-        <SearchContainer />
+        <NavBar />
+        <SearchContainer
+          allRepositories={this.state.allRepositories}
+          importRepo={this.importRepo}
+        />
       </View>
     );
   }
