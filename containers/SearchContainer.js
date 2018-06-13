@@ -21,7 +21,9 @@ class SearchContainer extends Component {
   searchRepositories = async () => {
     if (this.state.inputText !== "") {
       let apiResponse = await axios.get(
-        `https://api.github.com/search/repositories?q=${this.state.inputText}`
+        `https://api.github.com/search/repositories?q=${
+          this.state.inputText
+        }&page=1&per_page=100`
       );
       if (apiResponse.data.items.length > 0) {
         let structuredData = [];
@@ -64,15 +66,21 @@ class SearchContainer extends Component {
             title="Search"
           />
         </View>
-        {/* <ScrollView style={styles.searchResult}>{searchResult}</ScrollView> */}
 
         <FlatList
           data={this.state.repositories}
           keyExtractor={item => `${item.id}`}
+          extraData={this.props}
           renderItem={({ item }) => {
             let dynamicStyle = {};
             let id = `${item.id}`;
+            console.log(
+              "NOW THE CONTROL SHOUD GO TO CHANGING COLOR -------------------"
+            );
             if (_.includes(this.props.allRepositories, id)) {
+              console.log(
+                "THIS SHOULD BE QNIQUE COLOR ---------------------------------- "
+              );
               dynamicStyle.backgroundColor = "#99ccff";
             }
             return (
@@ -81,9 +89,7 @@ class SearchContainer extends Component {
                   <Text style={[styles.repoElements, { fontSize: 25 }]}>
                     {item.name}
                   </Text>
-                  <Text style={styles.repoElements}>
-                    Stars: {item.stargazers_count}
-                  </Text>
+                  <Text style={styles.repoElements}>Stars: {item.stars}</Text>
                   <Text style={styles.repoElements}>Forks: {item.forks}</Text>
                 </View>
                 <View style={{ flex: 1, justifyContent: "center" }}>

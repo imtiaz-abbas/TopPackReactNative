@@ -17,6 +17,8 @@ export default class App extends Component<Props> {
     allRepositories: []
   };
   importRepo = id => {
+    console.log("THIS IS THE ID : ------------------------- : " + `${id}`);
+    console.log("This is the all Repos", this.state.allRepositories);
     if (_.includes(this.state.allRepositories, id)) {
       //TODO SHOW USER THAT THE REPOSITORY HAS ALREADY BEEN IMPORTED....
     } else {
