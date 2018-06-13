@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import TopPackContainer from "./TopPackContainer";
 import axios from "axios";
 import {
+  ToastAndroid,
   Platform,
   ScrollView,
   Image,
@@ -46,17 +47,23 @@ class SearchContainer extends Component {
           errorMessage: null
         });
       } else {
-        this.setState({ errorMessage: "No Repositories found." });
+        ToastAndroid.show("No repositories found related to the search", 0.5);
+        this.setState({
+          errorMessage: "No Repositories found.",
+          loading: false
+        });
       }
     } else {
-      this.setState({ errorMessage: "Enter a search string." });
+      ToastAndroid.show("Enter a search String", 0.5);
     }
   };
   renderRepoItem = ({ item }) => {
     let dynamicStyle = {};
     let id = `${item.id}`;
+    let alreadyExists = false;
     if (_.includes(this.props.allRepositories, id)) {
       dynamicStyle.backgroundColor = "#99ccff";
+      alreadyExists = true;
     }
     return (
       <View key={id} style={[styles.repoContainer, dynamicStyle]}>
@@ -73,6 +80,7 @@ class SearchContainer extends Component {
             onPress={() => {
               this.props.importRepo(id);
             }}
+            disabled={alreadyExists}
           />
         </View>
       </View>

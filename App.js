@@ -7,7 +7,14 @@
 import React, { Component } from "react";
 import NavBar from "./containers/NavBar.js";
 import SearchContainer from "./containers/SearchContainer";
-import { Platform, StyleSheet, ScrollView, Text, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  ScrollView,
+  Text,
+  View,
+  ToastAndroid
+} from "react-native";
 import _ from "lodash";
 import axios from "axios";
 import TopPackContainer from "./containers/TopPackContainer";
