@@ -14,22 +14,31 @@ import TopPackContainer from "./containers/TopPackContainer";
 type Props = {};
 export default class App extends Component<Props> {
   state = {
+    currentPage: 1,
     allRepositories: []
   };
   importRepo = id => {
-    console.log("THIS IS THE ID : ------------------------- : " + `${id}`);
-    console.log("This is the all Repos", this.state.allRepositories);
     if (_.includes(this.state.allRepositories, id)) {
       //TODO SHOW USER THAT THE REPOSITORY HAS ALREADY BEEN IMPORTED....
     } else {
       this.setState({ allRepositories: [...this.state.allRepositories, id] });
     }
   };
+  loadSearchContainer = () => {
+    this.setState({ currentPage: 1 });
+  };
+  loadTopPackContainer = () => {
+    this.setState({ currentPage: 2 });
+  };
   render() {
     return (
       <View style={styles.container}>
-        <NavBar />
+        <NavBar
+          loadSearchContainer={this.loadSearchContainer}
+          loadTopPackContainer={this.loadTopPackContainer}
+        />
         <SearchContainer
+          currentPage={this.state.currentPage}
           allRepositories={this.state.allRepositories}
           importRepo={this.importRepo}
         />

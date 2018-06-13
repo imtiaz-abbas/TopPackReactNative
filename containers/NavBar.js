@@ -13,10 +13,14 @@ const NavBar = props => {
     <View style={styles.navBar}>
       <TouchableOpacity
         style={{ flex: 1, borderRightWidth: 0.5, alignItems: "center" }}
+        onPress={props.loadSearchContainer}
       >
         <Text style={{ fontSize: 30, padding: 5, color: "white" }}>Search</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{ flex: 1, alignItems: "center" }}>
+      <TouchableOpacity
+        style={{ flex: 1, alignItems: "center" }}
+        onPress={props.loadTopPackContainer}
+      >
         <Text style={{ fontSize: 30, padding: 5, color: "white" }}>
           Toppacks
         </Text>
@@ -27,7 +31,7 @@ const NavBar = props => {
 
 const styles = StyleSheet.create({
   navBar: {
-    flex: 1,
+    height: 50,
     backgroundColor: "#0099ff",
     flexDirection: "row",
     justifyContent: "space-around",

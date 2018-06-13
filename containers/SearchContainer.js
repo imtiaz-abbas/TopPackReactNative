@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import TopPackContainer from "./TopPackContainer";
 import axios from "axios";
 import {
   Platform,
@@ -51,6 +52,33 @@ class SearchContainer extends Component {
       this.setState({ errorMessage: "Enter a search string." });
     }
   };
+  renderRepoItem = ({ item }) => {
+    let dynamicStyle = {};
+    let id = `${item.id}`;
+    if (_.includes(this.props.allRepositories, id)) {
+      dynamicStyle.backgroundColor = "#99ccff";
+    }
+    return (
+      <View key={id} style={[styles.repoContainer, dynamicStyle]}>
+        <View style={{ flex: 3 }}>
+          <Text style={[styles.repoElements, { fontSize: 25 }]}>
+            {item.name}
+          </Text>
+          <Text style={styles.repoElements}>Stars: {item.stars}</Text>
+          <Text style={styles.repoElements}>Forks: {item.forks}</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <Button
+            title="Import"
+            onPress={() => {
+              this.props.importRepo(id);
+            }}
+          />
+        </View>
+      </View>
+    );
+  };
+
   render() {
     let loading = null;
     if (this.state.loading) {
@@ -66,64 +94,37 @@ class SearchContainer extends Component {
     } else {
       loading = null;
     }
-    return (
-      <View style={styles.searchContainer}>
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 22 }}>Search</Text>
-          <TextInput
-            onChangeText={event => {
-              this.setState({ inputText: event });
-            }}
-            style={{ fontSize: 19 }}
-            placeholder="Search for Repositories Here"
-          />
-          <Button
-            onPress={() => {
-              this.searchRepositories();
-            }}
-            title="Search"
+    if (this.props.currentPage === 1) {
+      return (
+        <View style={styles.searchContainer}>
+          <View style={{ marginBottom: 20 }}>
+            <Text style={{ fontSize: 22 }}>Search</Text>
+            <TextInput
+              onChangeText={event => {
+                this.setState({ inputText: event });
+              }}
+              style={{ fontSize: 19 }}
+              placeholder="Search for Repositories Here"
+            />
+            <Button
+              onPress={() => {
+                this.searchRepositories();
+              }}
+              title="Search"
+            />
+          </View>
+          {loading}
+          <FlatList
+            data={this.state.repositories}
+            keyExtractor={item => `${item.id}`}
+            extraData={this.props}
+            renderItem={this.renderRepoItem}
           />
         </View>
-        {loading}
-        <FlatList
-          data={this.state.repositories}
-          keyExtractor={item => `${item.id}`}
-          extraData={this.props}
-          renderItem={({ item }) => {
-            let dynamicStyle = {};
-            let id = `${item.id}`;
-            console.log(
-              "NOW THE CONTROL SHOUD GO TO CHANGING COLOR -------------------"
-            );
-            if (_.includes(this.props.allRepositories, id)) {
-              console.log(
-                "THIS SHOULD BE QNIQUE COLOR ---------------------------------- "
-              );
-              dynamicStyle.backgroundColor = "#99ccff";
-            }
-            return (
-              <View key={id} style={[styles.repoContainer, dynamicStyle]}>
-                <View style={{ flex: 3 }}>
-                  <Text style={[styles.repoElements, { fontSize: 25 }]}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.repoElements}>Stars: {item.stars}</Text>
-                  <Text style={styles.repoElements}>Forks: {item.forks}</Text>
-                </View>
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                  <Button
-                    title="Import"
-                    onPress={() => {
-                      this.props.importRepo(id);
-                    }}
-                  />
-                </View>
-              </View>
-            );
-          }}
-        />
-      </View>
-    );
+      );
+    } else {
+      return <TopPackContainer />;
+    }
   }
 }
 
