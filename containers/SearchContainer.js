@@ -122,8 +122,16 @@ class SearchContainer extends Component {
           />
         </View>
       );
+    } else if (this.props.topPacks.length > 0) {
+      return <TopPackContainer topPacks={this.props.topPacks} />;
     } else {
-      return <TopPackContainer />;
+      return (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text>No TopPacks yet.</Text>
+        </View>
+      );
     }
   }
 }
