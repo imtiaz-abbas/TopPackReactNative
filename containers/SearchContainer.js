@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   Platform,
   ScrollView,
+  Image,
   TextInput,
   StyleSheet,
   Button,
@@ -16,10 +17,12 @@ class SearchContainer extends Component {
   state = {
     inputText: "",
     repositories: [],
+    loading: false,
     errorMessage: null
   };
   searchRepositories = async () => {
     if (this.state.inputText !== "") {
+      this.setState({ loading: true });
       let apiResponse = await axios.get(
         `https://api.github.com/search/repositories?q=${
           this.state.inputText
@@ -37,6 +40,7 @@ class SearchContainer extends Component {
           structuredData.push(dataObject);
         });
         this.setState({
+          loading: false,
           repositories: structuredData,
           errorMessage: null
         });
@@ -48,6 +52,20 @@ class SearchContainer extends Component {
     }
   };
   render() {
+    let loading = null;
+    if (this.state.loading) {
+      loading = (
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <Image
+            source={require("./img.gif")}
+            style={{ height: 60, width: 60 }}
+            resizeMode="contain"
+          />
+        </View>
+      );
+    } else {
+      loading = null;
+    }
     return (
       <View style={styles.searchContainer}>
         <View style={{ marginBottom: 20 }}>
@@ -66,7 +84,7 @@ class SearchContainer extends Component {
             title="Search"
           />
         </View>
-
+        {loading}
         <FlatList
           data={this.state.repositories}
           keyExtractor={item => `${item.id}`}
