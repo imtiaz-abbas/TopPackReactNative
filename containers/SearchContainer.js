@@ -6,6 +6,7 @@ import {
   TextInput,
   StyleSheet,
   Button,
+  FlatList,
   TouchableOpacity,
   Text,
   View
@@ -23,8 +24,18 @@ class SearchContainer extends Component {
         `https://api.github.com/search/repositories?q=${this.state.inputText}`
       );
       if (apiResponse.data.items.length > 0) {
+        let structuredData = [];
+        apiResponse.data.items.map(item => {
+          let dataObject = {
+            name: item.name,
+            id: item.id,
+            stars: item.stargazers_count,
+            forks: item.forks
+          };
+          structuredData.push(dataObject);
+        });
         this.setState({
-          repositories: apiResponse.data.items,
+          repositories: structuredData,
           errorMessage: null
         });
       } else {
@@ -34,41 +45,7 @@ class SearchContainer extends Component {
       this.setState({ errorMessage: "Enter a search string." });
     }
   };
-
   render() {
-    let searchResult = null;
-    if (this.state.errorMessage == null) {
-      searchResult = this.state.repositories.map((entry, key) => {
-        let dynamicStyle = {};
-        let id = `${entry.id}`;
-        if (_.includes(this.props.allRepositories, id)) {
-          dynamicStyle.backgroundColor = "#99ccff";
-        }
-        return (
-          <View key={key} style={[styles.repoContainer, dynamicStyle]}>
-            <View style={{ flex: 3 }}>
-              <Text style={[styles.repoElements, { fontSize: 25 }]}>
-                {entry.name}
-              </Text>
-              <Text style={styles.repoElements}>
-                Stars: {entry.stargazers_count}
-              </Text>
-              <Text style={styles.repoElements}>Forks: {entry.forks}</Text>
-            </View>
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <Button
-                title="Import"
-                onPress={() => {
-                  this.props.importRepo(id);
-                }}
-              />
-            </View>
-          </View>
-        );
-      });
-    } else {
-      searchResult = <Text>{this.state.errorMessage}</Text>;
-    }
     return (
       <View style={styles.searchContainer}>
         <View style={{ marginBottom: 20 }}>
@@ -86,11 +63,41 @@ class SearchContainer extends Component {
             }}
             title="Search"
           />
-          {/* <TouchableOpacity style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.searchButton}>Search</Text>
-            </TouchableOpacity> */}
         </View>
-        <ScrollView style={styles.searchResult}>{searchResult}</ScrollView>
+        {/* <ScrollView style={styles.searchResult}>{searchResult}</ScrollView> */}
+
+        <FlatList
+          data={this.state.repositories}
+          keyExtractor={item => `${item.id}`}
+          renderItem={({ item }) => {
+            let dynamicStyle = {};
+            let id = `${item.id}`;
+            if (_.includes(this.props.allRepositories, id)) {
+              dynamicStyle.backgroundColor = "#99ccff";
+            }
+            return (
+              <View key={id} style={[styles.repoContainer, dynamicStyle]}>
+                <View style={{ flex: 3 }}>
+                  <Text style={[styles.repoElements, { fontSize: 25 }]}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.repoElements}>
+                    Stars: {item.stargazers_count}
+                  </Text>
+                  <Text style={styles.repoElements}>Forks: {item.forks}</Text>
+                </View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                  <Button
+                    title="Import"
+                    onPress={() => {
+                      this.props.importRepo(id);
+                    }}
+                  />
+                </View>
+              </View>
+            );
+          }}
+        />
       </View>
     );
   }
