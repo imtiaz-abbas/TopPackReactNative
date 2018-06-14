@@ -28,11 +28,11 @@ class SearchContainer extends Component {
   searchRepositories = async () => {
     if (this.state.inputText !== "") {
       this.setState({ loading: true });
-      let apiResponse = await axios.get(
-        `https://api.github.com/search/repositories?q=${
-          this.state.inputText
-        }&page=1&per_page=100`
-      );
+      let url =
+        "https://api.github.com/search/repositories?q=" +
+        this.state.inputText +
+        "&page=1&per_page=100";
+      let apiResponse = await axios.get(url);
       if (apiResponse.data.items.length > 0) {
         let structuredData = [];
         apiResponse.data.items.map(item => {
@@ -90,6 +90,25 @@ class SearchContainer extends Component {
       </View>
     );
   };
+  getNextPage = () => {
+    let start = this.state.pageNumber * 10;
+    let end = start + 10;
+    let newPageNumber = this.state.pageNumber + 1;
+    let newData = [
+      ...this.state.pageData,
+      ...this.state.repositories.slice(start, end)
+    ];
+    console.log(
+      "THIS IS THE NEW PAGE DATA : ------------------------------- >      " +
+        start +
+        " End " +
+        end
+    );
+    this.setState({
+      pageData: newData,
+      pageNumber: newPageNumber
+    });
+  };
   render() {
     let loading = null;
     if (this.state.loading) {
@@ -107,25 +126,14 @@ class SearchContainer extends Component {
           keyExtractor={item => `${item.id}`}
           extraData={this.props}
           renderItem={this.renderRepoItem}
+          onEndReachedThreshold={0.0001}
+          onEndReached={() => {
+            this.getNextPage();
+          }}
           ListFooterComponent={() => {
             return (
               <View style={{ height: 35 }}>
-                <Button
-                  title="Load More"
-                  onPress={() => {
-                    let start = this.state.pageNumber * 10;
-                    let end = start + 10;
-                    let newPageNumber = this.state.pageNumber + 1;
-                    let newData = [
-                      ...this.state.pageData,
-                      ...this.state.repositories.slice(start, end)
-                    ];
-                    this.setState({
-                      pageData: newData,
-                      pageNumber: newPageNumber
-                    });
-                  }}
-                />
+                <ActivityIndicator size="large" color="#99ccff" />
               </View>
             );
           }}
