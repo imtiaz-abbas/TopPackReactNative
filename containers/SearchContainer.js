@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import TopPackContainer from "./TopPackContainer";
+import DisplayRepositories from "./DisplayRepositories";
 import axios from "axios";
 import {
   ToastAndroid,
@@ -41,6 +42,7 @@ class SearchContainer extends Component {
           };
           structuredData.push(dataObject);
         });
+
         this.setState({
           loading: false,
           repositories: structuredData,
@@ -61,7 +63,7 @@ class SearchContainer extends Component {
     let dynamicStyle = {};
     let id = `${item.id}`;
     let alreadyExists = false;
-    if (_.includes(this.props.allRepositories, id)) {
+    if (_.includes(this.props.allRepositories.ids, id)) {
       dynamicStyle.backgroundColor = "#99ccff";
       alreadyExists = true;
     }
@@ -78,7 +80,7 @@ class SearchContainer extends Component {
           <Button
             title="Import"
             onPress={() => {
-              this.props.importRepo(id);
+              this.props.importRepo(id, item);
             }}
             disabled={alreadyExists}
           />
@@ -130,14 +132,31 @@ class SearchContainer extends Component {
           />
         </View>
       );
-    } else if (this.props.topPacks.length > 0) {
+    } else if (this.props.currentPage === 3 && this.props.topPacks.length > 0) {
       return <TopPackContainer topPacks={this.props.topPacks} />;
-    } else {
+    } else if (this.props.currentPage === 3) {
       return (
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
           <Text>No TopPacks yet.</Text>
+        </View>
+      );
+    } else if (
+      this.props.currentPage === 2 &&
+      this.props.allRepositories.ids.length > 0
+    ) {
+      return (
+        <DisplayRepositories
+          allRepositories={this.props.allRepositories.data}
+        />
+      );
+    } else {
+      return (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text>No Repositories yet.</Text>
         </View>
       );
     }

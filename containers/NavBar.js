@@ -15,14 +15,22 @@ const NavBar = props => {
         style={{ flex: 1, borderRightWidth: 0.5, alignItems: "center" }}
         onPress={props.loadSearchContainer}
       >
-        <Text style={{ fontSize: 30, padding: 5, color: "white" }}>Search</Text>
+        <Text style={{ fontSize: 26, padding: 5, color: "white" }}>Search</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={{ flex: 1, alignItems: "center" }}
         onPress={props.loadTopPackContainer}
       >
-        <Text style={{ fontSize: 30, padding: 5, color: "white" }}>
+        <Text style={{ fontSize: 26, padding: 5, color: "white" }}>
           Toppacks
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{ flex: 1, alignItems: "center" }}
+        onPress={props.loadRepositoriesContainer}
+      >
+        <Text style={{ fontSize: 26, padding: 5, color: "white" }}>
+          Imports
         </Text>
       </TouchableOpacity>
     </View>

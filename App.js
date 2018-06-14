@@ -25,35 +25,47 @@ export default class App extends Component<Props> {
     topPacks: [],
     allDependencies: [],
     currentPage: 1,
-    allRepositories: []
+    allRepositories: { ids: [], data: [] }
   };
-  importRepo = async id => {
-    if (_.includes(this.state.allRepositories, id)) {
+  importRepo = async (id, item) => {
+    if (_.includes(this.state.allRepositories.ids, id)) {
       //TODO SHOW USER THAT THE REPOSITORY HAS ALREADY BEEN IMPORTED....
     } else {
       // this.setState({ allRepositories: [...this.state.allRepositories, id] });
       let url = "https://api.github.com/repositories/";
       url += id;
       let json = await axios.get(url);
-      this.importPackages(json.data.full_name, id);
+      this.importPackages(json.data.full_name, id, item);
     }
   };
 
-  importPackages = async (repoName, localId) => {
+  importPackages = async (repoName, localId, item) => {
     let fileExists = false;
     let message = null;
-    let allRepositories = [];
+    let allRepositories = {
+      ids: [],
+      data: [...this.state.allRepositories.data]
+    };
     let allDependencies = [];
     let localDependencies = [];
-    if (this.state.allRepositories.indexOf(localId) !== -1) {
+    if (
+      this.state.allRepositories.ids.length > 0 &&
+      this.state.allRepositories.ids.indexOf(localId) !== -1
+    ) {
       message = "This repository is already imported";
       this.getPackages({
-        allRepositories: this.state.allRepositories,
+        allRepositories: {
+          ids: this.state.allRepositories.ids,
+          data: this.state.allRepositories.data
+        },
         allDependencies: this.state.allDependencies,
         message: message
       });
       this.setState({
-        allRepositories: this.state.allRepositories,
+        allRepositories: {
+          ids: this.state.allRepositories.ids,
+          data: this.state.allRepositories.data
+        },
         allDependencies: this.state.allDependencies,
         message: message
       });
@@ -92,7 +104,8 @@ export default class App extends Component<Props> {
         allDependencies = [...this.state.allDependencies];
         message = "Package.json Not Found In This Repository";
       }
-      allRepositories = [...this.state.allRepositories, localId];
+      allRepositories.ids = [...this.state.allRepositories.ids, localId];
+      allRepositories.data = [...this.state.allRepositories.data, item];
       this.getPackages({
         allRepositories: allRepositories,
         allDependencies: allDependencies,
@@ -142,8 +155,11 @@ export default class App extends Component<Props> {
   loadSearchContainer = () => {
     this.setState({ currentPage: 1 });
   };
-  loadTopPackContainer = () => {
+  loadRepositoriesContainer = () => {
     this.setState({ currentPage: 2 });
+  };
+  loadTopPackContainer = () => {
+    this.setState({ currentPage: 3 });
   };
   render() {
     return (
@@ -152,6 +168,7 @@ export default class App extends Component<Props> {
           topPacks={this.state.topPacks}
           loadSearchContainer={this.loadSearchContainer}
           loadTopPackContainer={this.loadTopPackContainer}
+          loadRepositoriesContainer={this.loadRepositoriesContainer}
         />
         <SearchContainer
           topPacks={this.state.topPacks}
