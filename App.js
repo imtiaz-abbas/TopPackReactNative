@@ -6,7 +6,7 @@
 
 import React, { Component } from "react";
 import NavBar from "./containers/NavBar.js";
-import SearchContainer from "./containers/SearchContainer";
+import MainContainer from "./containers/MainContainer";
 import {
   Platform,
   StyleSheet,
@@ -31,7 +31,6 @@ export default class App extends Component<Props> {
     if (_.includes(this.state.allRepositories.ids, id)) {
       //TODO SHOW USER THAT THE REPOSITORY HAS ALREADY BEEN IMPORTED....
     } else {
-      // this.setState({ allRepositories: [...this.state.allRepositories, id] });
       let url = "https://api.github.com/repositories/";
       url += id;
       let json = await axios.get(url);
@@ -170,7 +169,7 @@ export default class App extends Component<Props> {
           loadTopPackContainer={this.loadTopPackContainer}
           loadRepositoriesContainer={this.loadRepositoriesContainer}
         />
-        <SearchContainer
+        <MainContainer
           topPacks={this.state.topPacks}
           currentPage={this.state.currentPage}
           allRepositories={this.state.allRepositories}

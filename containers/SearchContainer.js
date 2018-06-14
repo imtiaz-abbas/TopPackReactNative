@@ -1,27 +1,20 @@
 import React, { Component } from "react";
-import TopPackContainer from "./TopPackContainer";
-import DisplayRepositories from "./DisplayRepositories";
-import axios from "axios";
 import {
-  ToastAndroid,
-  Platform,
-  ScrollView,
-  Image,
+  View,
+  Text,
   TextInput,
+  FlatList,
   StyleSheet,
   Button,
-  FlatList,
-  TouchableOpacity,
-  Text,
-  View
+  ToastAndroid,
+  Image
 } from "react-native";
-import _ from "lodash";
+import axios from "axios";
 class SearchContainer extends Component {
   state = {
     inputText: "",
     repositories: [],
-    loading: false,
-    errorMessage: null
+    loading: false
   };
   searchRepositories = async () => {
     if (this.state.inputText !== "") {
@@ -45,13 +38,11 @@ class SearchContainer extends Component {
 
         this.setState({
           loading: false,
-          repositories: structuredData,
-          errorMessage: null
+          repositories: structuredData
         });
       } else {
         ToastAndroid.show("No repositories found related to the search", 0.5);
         this.setState({
-          errorMessage: "No Repositories found.",
           loading: false
         });
       }
@@ -88,7 +79,6 @@ class SearchContainer extends Component {
       </View>
     );
   };
-
   render() {
     let loading = null;
     if (this.state.loading) {
@@ -101,65 +91,34 @@ class SearchContainer extends Component {
           />
         </View>
       );
-    } else {
-      loading = null;
     }
-    if (this.props.currentPage === 1) {
-      return (
-        <View style={styles.searchContainer}>
-          <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontSize: 22 }}>Search</Text>
-            <TextInput
-              onChangeText={event => {
-                this.setState({ inputText: event });
-              }}
-              style={{ fontSize: 19 }}
-              placeholder="Search for Repositories Here"
-            />
-            <Button
-              onPress={() => {
-                this.searchRepositories();
-              }}
-              title="Search"
-            />
-          </View>
-          {loading}
-          <FlatList
-            data={this.state.repositories}
-            keyExtractor={item => `${item.id}`}
-            extraData={this.props}
-            renderItem={this.renderRepoItem}
+    return (
+      <View style={styles.searchContainer}>
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 22 }}>Search</Text>
+          <TextInput
+            onChangeText={event => {
+              this.setState({ inputText: event });
+            }}
+            style={{ fontSize: 19 }}
+            placeholder="Search for Repositories Here"
+          />
+          <Button
+            onPress={() => {
+              this.searchRepositories();
+            }}
+            title="Search"
           />
         </View>
-      );
-    } else if (this.props.currentPage === 3 && this.props.topPacks.length > 0) {
-      return <TopPackContainer topPacks={this.props.topPacks} />;
-    } else if (this.props.currentPage === 3) {
-      return (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Text>No TopPacks yet.</Text>
-        </View>
-      );
-    } else if (
-      this.props.currentPage === 2 &&
-      this.props.allRepositories.ids.length > 0
-    ) {
-      return (
-        <DisplayRepositories
-          allRepositories={this.props.allRepositories.data}
+        {loading}
+        <FlatList
+          data={this.state.repositories}
+          keyExtractor={item => `${item.id}`}
+          extraData={this.props}
+          renderItem={this.renderRepoItem}
         />
-      );
-    } else {
-      return (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Text>No Repositories yet.</Text>
-        </View>
-      );
-    }
+      </View>
+    );
   }
 }
 
@@ -185,4 +144,5 @@ const styles = StyleSheet.create({
     padding: 5
   }
 });
+
 export default SearchContainer;
