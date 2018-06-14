@@ -4,15 +4,18 @@ import {
   Text,
   TextInput,
   FlatList,
+  ActivityIndicator,
   StyleSheet,
   Button,
-  ToastAndroid,
-  Image
+  ToastAndroid
 } from "react-native";
 import axios from "axios";
 import _ from "lodash";
 class SearchContainer extends Component {
   state = {
+    pageNumber: null,
+    showLoadMore: false,
+    pageData: [],
     inputText: "",
     repositories: [],
     loading: false
@@ -39,6 +42,8 @@ class SearchContainer extends Component {
 
         this.setState({
           loading: false,
+          pageNumber: 1,
+          pageData: structuredData.slice(0, 10),
           repositories: structuredData
         });
       } else {
@@ -85,12 +90,41 @@ class SearchContainer extends Component {
     if (this.state.loading) {
       loading = (
         <View style={{ alignItems: "center", justifyContent: "center" }}>
-          <Image
-            source={require("./img.gif")}
-            style={{ height: 60, width: 60 }}
-            resizeMode="contain"
-          />
+          <ActivityIndicator size="large" color="#99ccff" />
         </View>
+      );
+    }
+    let showSearchResult = null;
+    if (this.state.pageData.length > 0) {
+      showSearchResult = (
+        <FlatList
+          data={this.state.pageData}
+          keyExtractor={item => `${item.id}`}
+          extraData={this.props}
+          renderItem={this.renderRepoItem}
+          ListFooterComponent={() => {
+            return (
+              <View style={{ height: 35 }}>
+                <Button
+                  title="Load More"
+                  onPress={() => {
+                    let start = this.state.pageNumber * 10;
+                    let end = start + 10;
+                    let newPageNumber = this.state.pageNumber + 1;
+                    let newData = [
+                      ...this.state.pageData,
+                      ...this.state.repositories.slice(start, end)
+                    ];
+                    this.setState({
+                      pageData: newData,
+                      pageNumber: newPageNumber
+                    });
+                  }}
+                />
+              </View>
+            );
+          }}
+        />
       );
     }
     return (
@@ -112,12 +146,7 @@ class SearchContainer extends Component {
           />
         </View>
         {loading}
-        <FlatList
-          data={this.state.repositories}
-          keyExtractor={item => `${item.id}`}
-          extraData={this.props}
-          renderItem={this.renderRepoItem}
-        />
+        {showSearchResult}
       </View>
     );
   }
