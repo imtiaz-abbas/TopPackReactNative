@@ -10,6 +10,7 @@ import {
   Image
 } from "react-native";
 import axios from "axios";
+import _ from "lodash";
 class SearchContainer extends Component {
   state = {
     inputText: "",

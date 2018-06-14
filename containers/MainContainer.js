@@ -3,14 +3,13 @@ import SearchContainer from "./SearchContainer";
 import TopPackContainer from "./TopPackContainer";
 import DisplayRepositories from "./DisplayRepositories";
 import { StyleSheet, Text, View } from "react-native";
-import _ from "lodash";
 class MainContainer extends Component {
   render() {
     if (this.props.currentPage === 1) {
       return (
         <SearchContainer
           allRepositories={this.props.allRepositories}
-          importRepo={this.importRepo}
+          importRepo={this.props.importRepo}
         />
       );
     } else if (this.props.currentPage === 3 && this.props.topPacks.length > 0) {
