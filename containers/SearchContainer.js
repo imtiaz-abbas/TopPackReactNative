@@ -16,9 +16,14 @@ class SearchContainer extends Component {
     pageNumber: null,
     showLoadMore: false,
     pageData: [],
+    allRepositories: [],
     inputText: "",
     repositories: [],
     loading: false
+  };
+  callimportRepo = (id, items) => {
+    this.props.importRepo(id, items),
+      this.setState({ allRepositories: [...this.state.allRepositories, id] });
   };
   searchRepositories = async () => {
     if (this.state.inputText !== "") {
@@ -60,7 +65,7 @@ class SearchContainer extends Component {
     let dynamicStyle = {};
     let id = `${item.id}`;
     let alreadyExists = false;
-    if (_.includes(this.props.allRepositories.ids, id)) {
+    if (_.includes(this.state.allRepositories, id)) {
       dynamicStyle.backgroundColor = "#99ccff";
       alreadyExists = true;
     }
@@ -77,7 +82,7 @@ class SearchContainer extends Component {
           <Button
             title="Import"
             onPress={() => {
-              this.props.importRepo(id, item);
+              this.callimportRepo(id, item);
             }}
             disabled={alreadyExists}
           />
