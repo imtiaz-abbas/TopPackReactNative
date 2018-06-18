@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, Button, StyleSheet } from "react-native";
 
 const TopPackContainer = props => {
   const B = props => (
     <Text style={{ fontWeight: "bold", fontSize: 20 }}>{props.children}</Text>
   );
-  let toppacks = null;
+  let deleteBtn = null;
+  let topPacks = null;
   topPacks = props.topPacks.slice(0, 10).map((entry, key) => {
     return (
       <View key={key} style={styles.packageContainer}>
@@ -17,10 +18,32 @@ const TopPackContainer = props => {
       </View>
     );
   });
-  return <View style={{ flex: 1 }}>{topPacks}</View>;
+  if (props.topPacks.length > 0) {
+    deleteBtn = (
+      <View style={styles.deleteBtnContianer}>
+        <View style={styles.deleteBtn}>
+          <Button title="Delete Data" onPress={props.handleDataDeletion} />
+        </View>
+      </View>
+    );
+  }
+  return (
+    <View style={{ margin: 10, flex: 1 }}>
+      {topPacks}
+      {deleteBtn}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
+  deleteBtn: {
+    height: 30,
+    width: 100
+  },
+  deleteBtnContianer: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
   packageContainer: {
     justifyContent: "center",
     flex: 1,

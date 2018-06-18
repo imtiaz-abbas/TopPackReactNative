@@ -25,12 +25,17 @@ class MainContainer extends Component {
     if (this.props.currentPage === 1) {
       return (
         <SearchContainer
-          allRepositories={this.state.allRepositories}
+          allRepositories={this.props.allRepositories}
           importRepo={this.props.importRepo}
         />
       );
     } else if (this.props.currentPage === 3 && this.props.topPacks.length > 0) {
-      return <TopPackContainer topPacks={this.props.topPacks} />;
+      return (
+        <TopPackContainer
+          topPacks={this.props.topPacks}
+          handleDataDeletion={this.props.handleDataDeletion}
+        />
+      );
     } else if (this.props.currentPage === 3) {
       return (
         <View

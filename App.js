@@ -172,6 +172,19 @@ export default class App extends Component<Props> {
   loadTopPackContainer = () => {
     this.setState({ currentPage: 3 });
   };
+  handleDataDeletion = () => {
+    try {
+      AsyncStorage.removeItem("storageObject");
+      this.setState({
+        topPacks: [],
+        allDependencies: [],
+        currentPage: 1,
+        allRepositories: { ids: [], data: [] }
+      });
+    } catch (e) {
+      ToastAndroid.show("Internal Server Error.");
+    }
+  };
   render() {
     return (
       <View style={styles.container}>
@@ -183,6 +196,7 @@ export default class App extends Component<Props> {
         />
         <MainContainer
           topPacks={this.state.topPacks}
+          handleDataDeletion={this.handleDataDeletion}
           currentPage={this.state.currentPage}
           allRepositories={this.state.allRepositories}
           importRepo={this.importRepo}
