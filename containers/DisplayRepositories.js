@@ -1,12 +1,19 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, FlatList } from "react-native";
-
-const DisplayRepositories = props => {
-  const B = props => (
-    <Text style={{ fontWeight: "bold", fontSize: 20 }}>{props.children}</Text>
-  );
-  let repositories = null;
-  let renderRepoItem = ({ item }) => {
+import { Text, View, StyleSheet, AsyncStorage, FlatList } from "react-native";
+class DisplayRepositories extends Component {
+  state = {
+    asyncObj: null
+  };
+  componentDidMount = async () => {
+    let item = await AsyncStorage.getItem("storageObject");
+    item = JSON.parse(item);
+    if (item) {
+      this.setState({
+        asyncObj: item
+      });
+    }
+  };
+  renderRepoItem = ({ item }) => {
     return (
       <View key={item.id} style={[styles.repoContainer]}>
         <View style={{ flex: 3 }}>
@@ -19,18 +26,27 @@ const DisplayRepositories = props => {
       </View>
     );
   };
-  return (
-    <View style={styles.packageContainer}>
-      <FlatList
-        data={props.allRepositories}
-        keyExtractor={item => `${item.id}`}
-        extraData={props}
-        renderItem={renderRepoItem}
-      />
-    </View>
-  );
-};
-
+  render() {
+    if (this.state.asyncObj) {
+      return (
+        <View style={styles.packageContainer}>
+          <FlatList
+            data={this.state.asyncObj.allRepositories.data}
+            keyExtractor={item => `${item.id}`}
+            extraData={this.props}
+            renderItem={this.renderRepoItem}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View>
+          <Text>Nothing is being returned.</Text>
+        </View>
+      );
+    }
+  }
+}
 const styles = StyleSheet.create({
   packageContainer: {
     justifyContent: "center",

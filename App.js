@@ -13,7 +13,8 @@ import {
   ScrollView,
   Text,
   View,
-  ToastAndroid
+  ToastAndroid,
+  AsyncStorage
 } from "react-native";
 import _ from "lodash";
 import axios from "axios";
@@ -23,10 +24,22 @@ type Props = {};
 export default class App extends Component<Props> {
   state = {
     topPacks: [],
-    // repositories: [],
     allDependencies: [],
     currentPage: 1,
     allRepositories: { ids: [], data: [] }
+  };
+  componentDidMount = async () => {
+    try {
+      let item = await AsyncStorage.getItem("storageObject");
+      item = JSON.parse(item);
+      if (item) {
+        this.setState({
+          allDependencies: item.allDependencies,
+          allRepositories: item.allRepositories,
+          topPacks: item.topPacks
+        });
+      }
+    } catch (e) {}
   };
   importRepo = async (id, item) => {
     if (_.includes(this.state.allRepositories.ids, id)) {
@@ -34,14 +47,17 @@ export default class App extends Component<Props> {
     } else {
       let url = "https://api.github.com/repositories/";
       url += id;
-      let json = await axios.get(url);
-      this.importPackages(json.data.full_name, id, item);
+      try {
+        let json = await axios.get(url);
+        this.importPackages(json.data.full_name, id, item);
+      } catch (e) {
+        ToastAndroid.show("API rate limit exceeded.", 0.5);
+      }
     }
   };
 
   importPackages = async (repoName, localId, item) => {
     let fileExists = false;
-    let message = null;
     let allRepositories = {
       ids: [],
       data: [...this.state.allRepositories.data]
@@ -52,22 +68,12 @@ export default class App extends Component<Props> {
       this.state.allRepositories.ids.length > 0 &&
       this.state.allRepositories.ids.indexOf(localId) !== -1
     ) {
-      message = "This repository is already imported";
       this.getPackages({
         allRepositories: {
           ids: this.state.allRepositories.ids,
           data: this.state.allRepositories.data
         },
-        allDependencies: this.state.allDependencies,
-        message: message
-      });
-      this.setState({
-        allRepositories: {
-          ids: this.state.allRepositories.ids,
-          data: this.state.allRepositories.data
-        },
-        allDependencies: this.state.allDependencies,
-        message: message
+        allDependencies: this.state.allDependencies
       });
     } else {
       let repoContents = await axios.get(
@@ -98,23 +104,19 @@ export default class App extends Component<Props> {
           });
         }
         allDependencies = [...localDependencies, ...this.state.allDependencies];
-        message = "Success";
       } else {
         localDependencies = [];
         allDependencies = [...this.state.allDependencies];
-        message = "Package.json Not Found In This Repository";
+        ToastAndroid.show(
+          "No Package.json file was found in this repository",
+          0.5
+        );
       }
       allRepositories.ids = [...this.state.allRepositories.ids, localId];
       allRepositories.data = [...this.state.allRepositories.data, item];
       this.getPackages({
         allRepositories: allRepositories,
-        allDependencies: allDependencies,
-        message: message
-      });
-      this.setState({
-        allRepositories: allRepositories,
-        allDependencies: allDependencies,
-        message: message
+        allDependencies: allDependencies
       });
     }
   };
@@ -124,12 +126,21 @@ export default class App extends Component<Props> {
   getPackages = obj => {
     let topPacks = this.calculateTopPacks(obj.allDependencies);
     let reArrangedTopPacks = this.reArrange(topPacks);
+    let syncObject = {
+      allRepositories: obj.allRepositories,
+      allDependencies: obj.allDependencies,
+      topPacks: reArrangedTopPacks
+    };
+    try {
+      AsyncStorage.setItem("storageObject", JSON.stringify(syncObject));
+    } catch (error) {
+      ToastAndroid.show(error, 0.5);
+    }
     this.setState(() => {
       return {
         allRepositories: obj.allRepositories,
         allDependencies: obj.allDependencies,
-        topPacks: reArrangedTopPacks,
-        errorMessage: obj.message
+        topPacks: reArrangedTopPacks
       };
     });
   };

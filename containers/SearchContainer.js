@@ -21,6 +21,9 @@ class SearchContainer extends Component {
     repositories: [],
     loading: false
   };
+  componentDidMount() {
+    this.setState({ allRepositories: [...this.props.allRepositories.ids] });
+  }
   callimportRepo = (id, items) => {
     this.props.importRepo(id, items),
       this.setState({ allRepositories: [...this.state.allRepositories, id] });

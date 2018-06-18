@@ -2,13 +2,30 @@ import React, { Component } from "react";
 import SearchContainer from "./SearchContainer";
 import TopPackContainer from "./TopPackContainer";
 import DisplayRepositories from "./DisplayRepositories";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, AsyncStorage } from "react-native";
 class MainContainer extends Component {
+  state = {
+    allRepositories: {
+      ids: [],
+      data: []
+    }
+  };
+  componentDidMount = async () => {
+    try {
+      let item = await AsyncStorage.getItem("storageObject");
+      item = JSON.parse(item);
+      if (item) {
+        this.setState({
+          allRepositories: item.allRepositories
+        });
+      }
+    } catch (e) {}
+  };
   render() {
     if (this.props.currentPage === 1) {
       return (
         <SearchContainer
-          allRepositories={this.props.allRepositories}
+          allRepositories={this.state.allRepositories}
           importRepo={this.props.importRepo}
         />
       );
